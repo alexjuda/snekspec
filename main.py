@@ -53,10 +53,12 @@ def is_float(x):
 
 
 def main():
+    rating_spec = is_float
+    good_rating_spec = and_(rating_spec,
+                            lambda x: x > 0.6)
     spec = keys({'first': is_any,
                  'last': is_string,
-                 'ratings': coll_of(and_(is_float,
-                                         lambda x: x > 0.6))})
+                 'ratings': coll_of(good_rating_spec)})
 
     objs = [{'first': 'Kamaal',
              'last': 'Fareed',
