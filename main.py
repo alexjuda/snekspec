@@ -29,7 +29,7 @@ def tuple_(*e_specs):
 
 
 def explain(spec, x):
-    return _explain(spec, x, original_x=x, trace=[])
+    return list(_explain(spec, x, original_x=x, trace=[]))
 
 
 def _explain(spec, x, original_x, trace):
@@ -62,8 +62,9 @@ def _explain(spec, x, original_x, trace):
     elif spec != x:
         yield Explanation(x, spec, 'is not equal', original_x, trace)
 
+
 def is_valid(spec, x):
-    return [] == list(explain(spec, x))
+    return [] == explain(spec, x)
 
 
 def is_string(x):
@@ -110,9 +111,8 @@ def main():
              'last': '1',
              'ratings': [0.99, 0.7, 0.8, 0.5]}]
     for i, o in enumerate(objs):
-        explanations = list(explain(spec, o))
         print(f'obj {i} explanation')
-        pprint.pprint(explanations)
+        pprint.pprint(explain(spec, o))
     print('ssssss')
 
 
