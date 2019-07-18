@@ -3,12 +3,20 @@ import typing as t
 
 
 KeysSpec = c.namedtuple('KeysSpec', ['key_specs'])
-CollOf = c.namedtuple('CollOf', ['e_spec'])
-And = c.namedtuple('And', ['specs'])
+CollOfSpec = c.namedtuple('CollOfSpec', ['e_spec'])
+AndSpec = c.namedtuple('AndSpec', ['specs'])
 
 
-def keys():
-    pass
+def keys(kv_specs):
+    return KeysSpec(kv_specs)
+
+
+def coll_of(e_spec):
+    return CollOfSpec(e_spec)
+
+
+def and_(*specs):
+    return AndSpec(specs)
 
 
 def is_valid(spec, x):
@@ -21,12 +29,12 @@ def is_valid(spec, x):
             return False
         return all(is_valid(val_spec, val)
                    for val_spec, val in zip(spec.key_specs.values(), x.values()))
-    elif isinstance(spec, CollOf):
+    elif isinstance(spec, CollOfSpec):
         if not isinstance(x, t.Collection):
             return False
         return all(is_valid(spec.e_spec, e)
                    for e in x)
-    elif isinstance(spec, And):
+    elif isinstance(spec, AndSpec):
         return all(is_valid(s, x)
                    for s in spec.specs)
     else:
@@ -45,10 +53,10 @@ def is_float(x):
 
 
 def main():
-    spec = KeysSpec({'first': is_any,
-                     'last': is_string,
-                     'ratings': CollOf(And([is_float,
-                                            lambda x: x > 0.6]))})
+    spec = keys({'first': is_any,
+                 'last': is_string,
+                 'ratings': coll_of(and_(is_float,
+                                         lambda x: x > 0.6))})
 
     objs = [{'first': 'Kamaal',
              'last': 'Fareed',
