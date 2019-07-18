@@ -5,6 +5,7 @@ import typing as t
 KeysSpec = c.namedtuple('KeysSpec', ['key_specs'])
 CollOfSpec = c.namedtuple('CollOfSpec', ['e_spec'])
 AndSpec = c.namedtuple('AndSpec', ['specs'])
+TupleSpec = c.namedtuple('TupleSpec', ['e_specs'])
 
 
 def keys(kv_specs):
@@ -17,6 +18,10 @@ def coll_of(e_spec):
 
 def and_(*specs):
     return AndSpec(specs)
+
+
+def tuple_(*e_specs):
+    return TupleSpec(e_specs)
 
 
 def is_valid(spec, x):
@@ -37,6 +42,13 @@ def is_valid(spec, x):
     elif isinstance(spec, AndSpec):
         return all(is_valid(s, x)
                    for s in spec.specs)
+    elif isinstance(spec, TupleSpec):
+        if not isinstance(x, t.Collection):
+            return False
+        if len(spec.e_specs) != len(x):
+            return False
+        return all(is_valid(e_spec, e)
+                   for e_spec, e in zip(spec.e_specs, x))
     else:
         return spec == x
 
@@ -52,17 +64,31 @@ def is_float(x):
     return isinstance(x, float)
 
 
+def is_int(x):
+    return isinstance(x, int)
+
+
 def main():
     rating_spec = is_float
     good_rating_spec = and_(rating_spec,
                             lambda x: x > 0.6)
     spec = keys({'first': is_any,
                  'last': is_string,
-                 'ratings': coll_of(good_rating_spec)})
+                 'ratings': coll_of(good_rating_spec),
+                 'career_span': tuple_(is_int, is_int)})
 
     objs = [{'first': 'Kamaal',
              'last': 'Fareed',
-             'ratings': [0.9, 0.7, 0.9]},
+             'ratings': [0.9, 0.7, 0.9],
+             'career_span': (1990, 2019)},
+            {'first': 'Kamaal',
+             'last': 'Fareed',
+             'ratings': [0.9, 0.7, 0.9],
+             'career_span': (1990, '*')},
+            {'first': 'Kamaal',
+             'last': 'Fareed',
+             'ratings': [0.9, 0.7, 0.9],
+             'career_span': (1990, )},
             {'first': 'Q-Tip'},
             {'first': 'KRS',
              'last': 1,
