@@ -8,6 +8,9 @@ AndSpec = c.namedtuple('AndSpec', ['specs'])
 TupleSpec = c.namedtuple('TupleSpec', ['e_specs'])
 
 
+Explanation = c.namedtuple('Explanation', 'obj spec fail_reason original_obj trace')
+
+
 def keys(kv_specs):
     return KeysSpec(kv_specs)
 
@@ -24,33 +27,41 @@ def tuple_(*e_specs):
     return TupleSpec(e_specs)
 
 
-def is_valid(spec, x):
+def explain(spec, x):
+    return _explain(spec, x, original_x=x, trace=[])
+
+
+def _explain(spec, x, original_x, trace):
     if callable(spec):
-        return spec(x)
+        if not spec(x):
+            yield Explanation(x, spec, 'pred failed', original_x, trace)
     elif isinstance(spec, KeysSpec):
         if not isinstance(x, t.Mapping):
-            return False
-        if spec.key_specs.keys() != x.keys():
-            return False
-        return all(is_valid(val_spec, val)
-                   for val_spec, val in zip(spec.key_specs.values(), x.values()))
+            yield Explanation(x, spec, 'not a Mapping', original_x, trace)
+        if spec.key_specs.keys() < x.keys():
+            yield Explanation(x, spec, 'missing keys', original_x, trace)
+        for val_spec, (key, val) in zip(spec.key_specs.values(), x.items()):
+            yield from _explain(val_spec, val, original_x, trace + [key])
     elif isinstance(spec, CollOfSpec):
         if not isinstance(x, t.Collection):
-            return False
-        return all(is_valid(spec.e_spec, e)
-                   for e in x)
+            yield Explanation(x, spec, 'not a Collection', original_x, trace)
+        for i, e in enumerate(x):
+            yield from _explain(spec.e_spec, e, original_x, trace + [i])
     elif isinstance(spec, AndSpec):
-        return all(is_valid(s, x)
-                   for s in spec.specs)
+        for s in spec.specs:
+            yield from _explain(s, x, original_x, trace)
     elif isinstance(spec, TupleSpec):
         if not isinstance(x, t.Collection):
-            return False
+            yield Explanation(x, spec, 'is not a Collection', original_x, trace)
         if len(spec.e_specs) != len(x):
-            return False
-        return all(is_valid(e_spec, e)
-                   for e_spec, e in zip(spec.e_specs, x))
-    else:
-        return spec == x
+            yield Explanation(x, spec, 'invalid number of elements', original_x, trace)
+        for i, (e_spec, e) in enumerate(zip(spec.e_specs, x)):
+            yield from _explain(e_spec, e, original_x, trace + [i])
+    elif spec != x:
+        yield Explanation(x, spec, 'is not equal', original_x, trace)
+
+def is_valid(spec, x):
+    return [] == list(explain(spec, x))
 
 
 def is_string(x):
@@ -95,9 +106,9 @@ def main():
              'ratings': [0.8, 0.7, 0.9]},
             {'first': 'KRS',
              'last': '1',
-             'ratings': [0.5, 0.7, 0.9]}]
+             'ratings': [0.99, 0.7, 0.8, 0.5]}]
     for i, o in enumerate(objs):
-        print(f'obj {i+1} valid? {is_valid(spec, o)}')
+        print(f'obj {i} explanation: {list(explain(spec, o))}')
     print('ssssss')
 
 
