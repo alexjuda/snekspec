@@ -1,4 +1,5 @@
 import collections as c
+import pprint
 import typing as t
 
 
@@ -38,10 +39,11 @@ def _explain(spec, x, original_x, trace):
     elif isinstance(spec, KeysSpec):
         if not isinstance(x, t.Mapping):
             yield Explanation(x, spec, 'not a Mapping', original_x, trace)
-        if spec.key_specs.keys() < x.keys():
-            yield Explanation(x, spec, 'missing keys', original_x, trace)
-        for val_spec, (key, val) in zip(spec.key_specs.values(), x.items()):
-            yield from _explain(val_spec, val, original_x, trace + [key])
+        for spec_key, val_spec in spec.key_specs.items():
+            if spec_key not in x:
+                yield Explanation(spec_key, spec, 'key missing', original_x, trace)
+                continue
+            yield from _explain(val_spec, x[spec_key], original_x, trace + [spec_key])
     elif isinstance(spec, CollOfSpec):
         if not isinstance(x, t.Collection):
             yield Explanation(x, spec, 'not a Collection', original_x, trace)
@@ -108,7 +110,9 @@ def main():
              'last': '1',
              'ratings': [0.99, 0.7, 0.8, 0.5]}]
     for i, o in enumerate(objs):
-        print(f'obj {i} explanation: {list(explain(spec, o))}')
+        explanations = list(explain(spec, o))
+        print(f'obj {i} explanation')
+        pprint.pprint(explanations)
     print('ssssss')
 
 
