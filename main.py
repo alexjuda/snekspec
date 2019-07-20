@@ -2,6 +2,8 @@ import collections as c
 import pprint
 import typing as t
 
+import wiadro
+
 
 KeysSpec = c.namedtuple('KeysSpec', ['key_specs'])
 CollOfSpec = c.namedtuple('CollOfSpec', ['e_spec'])
@@ -110,6 +112,9 @@ def main():
             {'first': 'KRS',
              'last': '1',
              'ratings': [0.99, 0.7, 0.8, 0.5]}]
+
+    wiadro.dump(objs, 'objs')
+
     for i, o in enumerate(objs):
         print(f'obj {i} explanation')
         pprint.pprint(explain(spec, o))
