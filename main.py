@@ -11,7 +11,7 @@ def _spec():
 
 def main():
     spec = _spec()
-    st = s.strategy(spec)
+    st = spec.strategy()
     pprint.pprint(st)
     for _ in range(10):
         pprint.pprint(st.example())
