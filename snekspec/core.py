@@ -1,5 +1,6 @@
-import collections as c
 import typing as t
+import collections as c
+
 import hypothesis
 import hypothesis.strategies as hst
 
@@ -13,7 +14,10 @@ class PredSpec:
             yield Explanation(x, self, 'pred failed', orig_x, trace)
 
 
-class KeysSpec(c.namedtuple('_KeysSpec', ['key_specs'])):
+class KeysSpec:
+    def __init__(self, key_specs: t.Mapping):
+        self.key_specs = key_specs
+
     def explain(self, x, orig_x, trace):
         if isinstance(x, t.Mapping):
             for key, val_spec in self.key_specs.items():
@@ -27,7 +31,10 @@ class KeysSpec(c.namedtuple('_KeysSpec', ['key_specs'])):
             yield Explanation(x, self, 'Not a Mapping', orig_x, trace)
 
 
-class CollOfSpec(c.namedtuple('_CollOfSpec', ['element_spec'])):
+class CollOfSpec:
+    def __init__(self, element_spec):
+        self.element_spec = element_spec
+
     def explain(self, x, orig_x, trace):
         if not isinstance(x, t.Collection):
             yield Explanation(x, self, 'Not a Collection', orig_x, trace)
@@ -35,13 +42,19 @@ class CollOfSpec(c.namedtuple('_CollOfSpec', ['element_spec'])):
             yield from self.element_spec.explain(e, orig_x, trace + [i])
 
 
-class AndSpec (c.namedtuple('_AndSpec', ['specs'])):
+class AndSpec:
+    def __init__(self, specs):
+        self.specs = specs
+
     def explain(self, x, orig_x, trace):
         for spec in self.specs:
             yield from spec.explain(x, orig_x, trace)
 
 
-class TupleSpec(c.namedtuple('_TupleSpec', ['element_specs'])):
+class TupleSpec:
+    def __init__(self, element_specs):
+        self.element_specs = element_specs
+
     def explain(self, x, orig_x, trace):
         if not isinstance(x, t.Collection):
             yield Explanation(x, self, 'is not a Collection', orig_x, trace)
