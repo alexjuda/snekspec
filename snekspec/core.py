@@ -6,6 +6,7 @@ KeysSpec = c.namedtuple('KeysSpec', ['key_specs'])
 CollOfSpec = c.namedtuple('CollOfSpec', ['e_spec'])
 AndSpec = c.namedtuple('AndSpec', ['specs'])
 TupleSpec = c.namedtuple('TupleSpec', ['e_specs'])
+NilableSpec = c.namedtuple('NilableSpec', ['subspec'])
 
 
 Explanation = c.namedtuple('Explanation', 'obj spec fail_reason original_obj trace')
@@ -27,12 +28,21 @@ def tuple_(*e_specs):
     return TupleSpec(e_specs)
 
 
+def nilable(subspec):
+    return NilableSpec(subspec)
+
+
 def explain(spec, x):
     return list(_explain(spec, x, original_x=x, trace=[]))
 
 
 def _explain(spec, x, original_x, trace):
-    if callable(spec):
+    if x is None:
+        if isinstance(spec, NilableSpec):
+            return
+        else:
+            yield Explanation(x, spec, 'is None', original_x, trace)
+    elif callable(spec):
         if not spec(x):
             yield Explanation(x, spec, 'pred failed', original_x, trace)
     elif isinstance(spec, KeysSpec):

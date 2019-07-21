@@ -58,3 +58,16 @@ def test_invalid_nested_value():
            'ratings': [0.99, 0.7, 0.8, 0.5]}
     assert not s.is_valid(_spec(), obj)
     assert [] != s.explain(_spec(), obj)
+
+
+def test_invalid_none():
+    obj = None
+    assert not s.is_valid(_spec(), obj)
+    assert [] != s.explain(_spec(), obj)
+
+
+def test_none_with_nilable():
+    obj = None
+    spec = s.nilable(_spec())
+    assert s.is_valid(spec, obj)
+    assert [] == s.explain(spec, obj)
