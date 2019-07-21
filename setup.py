@@ -14,7 +14,7 @@ setuptools.setup(
     description='Validate data & generate test examples from scheme',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/alexjuda/snekspek',
+    url='https://github.com/alexjuda/snekspec',
     packages=setuptools.find_packages(),
     install_requires=['hypothesis>=4'],
     classifiers=[
