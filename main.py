@@ -1,7 +1,7 @@
 import pprint
 
 import snekspec.core as s
-import wiadro
+import snekspec.wiadro as wiadro
 
 
 def main():
