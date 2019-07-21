@@ -8,8 +8,13 @@ ipdb = "*"
 ipython = "*"
 pytest = "*"
 hypothesis = "*"
+jedi = "*"
+flake8 = "*"
+autopep8 = "*"
+twine = "*"
 
 [packages]
+hypothesis = "*"
 
 [requires]
 python_version = "3.7"
