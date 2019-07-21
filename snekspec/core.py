@@ -8,6 +8,8 @@ AndSpec = c.namedtuple('AndSpec', ['specs'])
 TupleSpec = c.namedtuple('TupleSpec', ['e_specs'])
 NilableSpec = c.namedtuple('NilableSpec', ['subspec'])
 
+StringSpec = c.namedtuple('StringSpec', [])
+
 class PredSpec:
     def __init__(self, f):
         self._f = f
@@ -52,6 +54,9 @@ def _explain(spec, x, original_x, trace):
     elif isinstance(spec, PredSpec):
         if not spec(x):
             yield Explanation(x, spec, 'pred failed', original_x, trace)
+    elif isinstance(spec, StringSpec):
+        if not isinstance(x, str):
+            yield Explanation(x, spec, 'invalid type', original_x, trace)
     elif isinstance(spec, KeysSpec):
         if not isinstance(x, t.Mapping):
             yield Explanation(x, spec, 'not a Mapping', original_x, trace)
@@ -88,7 +93,7 @@ def _make_instance_check(klass):
 
 
 def is_string():
-    return PredSpec(_make_instance_check(str))
+    return StringSpec()
 
 
 def is_any():
