@@ -113,7 +113,8 @@ def main():
              'last': '1',
              'ratings': [0.99, 0.7, 0.8, 0.5]}]
 
-    wiadro.dump(objs, 'objs')
+    # wiadro.dump(objs, 'objs')
+    wiadro.dump_all(locals())
 
     for i, o in enumerate(objs):
         print(f'obj {i} explanation')
