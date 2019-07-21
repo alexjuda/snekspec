@@ -1,5 +1,7 @@
 import collections as c
 import typing as t
+import hypothesis
+import hypothesis.strategies as hst
 
 
 KeysSpec = c.namedtuple('KeysSpec', ['key_specs'])
@@ -108,3 +110,12 @@ def is_int():
     return PredSpec(_make_instance_check(int))
 
 
+def strategy(spec):
+    if isinstance(spec, PredSpec):
+        # TODO
+        return hst.just(None)
+    elif isinstance(spec, StringSpec):
+        return hst.text()
+    elif isinstance(spec, KeysSpec):
+        return hst.fixed_dictionaries({k: strategy(val_spec)
+                                       for k, val_spec in spec.key_specs.items()})
