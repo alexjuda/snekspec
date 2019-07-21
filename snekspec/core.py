@@ -117,47 +117,7 @@ def nilable(subspec):
 
 
 def explain(spec, x):
-    return list(_explain(spec, x, orig_x=x, trace=[]))
-
-
-def _explain(spec, x, orig_x, trace):
-    yield from spec.explain(x, orig_x, trace)
-    # if x is None:
-    #     if isinstance(spec, NilableSpec):
-    #         return
-    #     else:
-    #         yield Explanation(x, spec, 'is None', orig_x, trace)
-    # elif isinstance(spec, PredSpec):
-    #     if not spec(x):
-    #         yield Explanation(x, spec, 'pred failed', orig_x, trace)
-    # elif isinstance(spec, StringSpec):
-    #     if not isinstance(x, str):
-    #         yield Explanation(x, spec, 'invalid type', orig_x, trace)
-    # elif isinstance(spec, KeysSpec):
-    #     if not isinstance(x, t.Mapping):
-    #         yield Explanation(x, spec, 'not a Mapping', orig_x, trace)
-    #     for spec_key, val_spec in spec.key_specs.items():
-    #         if spec_key not in x:
-    #             yield Explanation(spec_key, spec, 'key missing', orig_x, trace)
-    #             continue
-    #         yield from _explain(val_spec, x[spec_key], orig_x, trace + [spec_key])
-    # elif isinstance(spec, CollOfSpec):
-    #     if not isinstance(x, t.Collection):
-    #         yield Explanation(x, spec, 'not a Collection', orig_x, trace)
-    #     for i, e in enumerate(x):
-    #         yield from _explain(spec.e_spec, e, orig_x, trace + [i])
-    # elif isinstance(spec, AndSpec):
-    #     for s in spec.specs:
-    #         yield from _explain(s, x, orig_x, trace)
-    # elif isinstance(spec, TupleSpec):
-    #     if not isinstance(x, t.Collection):
-    #         yield Explanation(x, spec, 'is not a Collection', orig_x, trace)
-    #     if len(spec.e_specs) != len(x):
-    #         yield Explanation(x, spec, 'invalid number of elements', orig_x, trace)
-    #     for i, (e_spec, e) in enumerate(zip(spec.e_specs, x)):
-    #         yield from _explain(e_spec, e, orig_x, trace + [i])
-    # elif spec != x:
-    #     yield Explanation(x, spec, 'is not equal', orig_x, trace)
+    return list(spec.explain(x, orig_x=x, trace=[]))
 
 
 def is_valid(spec, x):
