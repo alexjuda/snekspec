@@ -169,3 +169,11 @@ def explain(spec, x):
 
 def is_valid(spec, x):
     return [] == explain(spec, x)
+
+
+def gen(spec):
+    return spec.strategy()
+
+
+def generate(spec_gen):
+    return spec_gen.example()
