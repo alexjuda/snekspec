@@ -16,6 +16,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/alexjuda/snekspek',
     packages=setuptools.find_packages(),
+    install_requires=['hypothesis>=4'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
