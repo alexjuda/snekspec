@@ -79,3 +79,9 @@ class TestStrategyGeneratesValidValue:
         val = data.draw(spec.strategy())
         assert s.is_valid(spec, val)
 
+    # @h.settings(deadline=1000.0)
+    @h.given(hst.data())
+    def test_coll_of(self, data):
+        spec = s.coll_of(s.NilableSpec(s.StringSpec()))
+        val = data.draw(spec.strategy())
+        assert s.is_valid(spec, val)

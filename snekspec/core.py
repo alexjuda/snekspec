@@ -51,7 +51,7 @@ class CollOfSpec:
             yield from self.element_spec.explain(e, orig_x, trace + [i])
 
     def strategy(self):
-        return hst.iterables(self.element_spec.strategy(), **self.st_kwargs)
+        return hst.lists(self.element_spec.strategy(), **self.st_kwargs)
 
 
 class AndSpec:
