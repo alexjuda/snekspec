@@ -2,13 +2,13 @@ import snekspec.core as s
 
 
 def _spec():
-    rating_spec = s.is_float
+    rating_spec = s.is_float()
     good_rating_spec = s.and_(rating_spec,
-                              lambda x: x > 0.6)
-    return s.keys({'first': s.is_any,
-                   'last': s.is_string,
+                              s.PredSpec(lambda x: x > 0.6))
+    return s.keys({'first': s.is_any(),
+                   'last': s.is_string(),
                    'ratings': s.coll_of(good_rating_spec),
-                   'career_span': s.tuple_(s.is_int, s.is_int)})
+                   'career_span': s.tuple_(s.is_int(), s.is_int())})
 
 
 def test_valid_obj():

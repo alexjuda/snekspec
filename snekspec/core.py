@@ -8,6 +8,13 @@ AndSpec = c.namedtuple('AndSpec', ['specs'])
 TupleSpec = c.namedtuple('TupleSpec', ['e_specs'])
 NilableSpec = c.namedtuple('NilableSpec', ['subspec'])
 
+class PredSpec:
+    def __init__(self, f):
+        self._f = f
+
+    def __call__(self, *args, **kwargs):
+        return self._f(*args, **kwargs)
+
 
 Explanation = c.namedtuple('Explanation', 'obj spec fail_reason original_obj trace')
 
@@ -42,7 +49,7 @@ def _explain(spec, x, original_x, trace):
             return
         else:
             yield Explanation(x, spec, 'is None', original_x, trace)
-    elif callable(spec):
+    elif isinstance(spec, PredSpec):
         if not spec(x):
             yield Explanation(x, spec, 'pred failed', original_x, trace)
     elif isinstance(spec, KeysSpec):
@@ -76,18 +83,23 @@ def is_valid(spec, x):
     return [] == explain(spec, x)
 
 
-def is_string(x):
-    return isinstance(x, str)
+def _make_instance_check(klass):
+    return lambda x: isinstance(x, klass)
 
 
-def is_any(x):
-    return True
+def is_string():
+    return PredSpec(_make_instance_check(str))
 
 
-def is_float(x):
-    return isinstance(x, float)
+def is_any():
+    return PredSpec(lambda x: True)
 
 
-def is_int(x):
-    return isinstance(x, int)
+def is_float():
+    return PredSpec(_make_instance_check(float))
+
+
+def is_int():
+    return PredSpec(_make_instance_check(int))
+
 
