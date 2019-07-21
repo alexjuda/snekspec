@@ -103,16 +103,17 @@ class NilableSpec:
                           self.subspec.strategy())
 
 
-class StringSpec:
-    def __init__(self, st_kwargs={}):
-        self.st_kwargs = st_kwargs
+class TypeSpec:
+    def __init__(self, type_, strategy):
+        self.type_ = type_
+        self.strategy_ = strategy
 
     def explain(self, x, orig_x, trace):
-        if not isinstance(x, str):
+        if not isinstance(x, self.type_):
             yield Explanation(x, self, 'invalid type', orig_x, trace)
 
     def strategy(self):
-        return hst.text(**self.st_kwargs)
+        return self.strategy_
 
 
 Explanation = c.namedtuple('Explanation', 'obj spec fail_reason original_obj trace')
@@ -138,29 +139,29 @@ def nilable(subspec):
     return NilableSpec(subspec)
 
 
-def explain(spec, x):
-    return list(spec.explain(x, orig_x=x, trace=[]))
-
-
-def is_valid(spec, x):
-    return [] == explain(spec, x)
-
-
 def _make_instance_check(klass):
     return lambda x: isinstance(x, klass)
 
 
-def is_string():
-    return StringSpec()
+def is_string(st_kwargs={}):
+    return TypeSpec(str, hst.text(**st_kwargs))
 
 
 def is_any():
     return PredSpec(lambda x: True)
 
 
-def is_float():
-    return PredSpec(_make_instance_check(float))
+def is_float(st_kwargs={}):
+    return TypeSpec(float, hst.floats(**st_kwargs))
 
 
-def is_int():
-    return PredSpec(_make_instance_check(int))
+def is_int(st_kwargs={}):
+    return TypeSpec(int, hst.integers(**st_kwargs))
+
+
+def explain(spec, x):
+    return list(spec.explain(x, orig_x=x, trace=[]))
+
+
+def is_valid(spec, x):
+    return [] == explain(spec, x)

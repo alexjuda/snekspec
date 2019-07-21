@@ -74,14 +74,19 @@ class TestStrategyGeneratesValidValue:
     @h.settings(deadline=1000.0)
     @h.given(hst.data())
     def test_keys(self, data):
-        spec = s.keys({'a': s.StringSpec(),
-                       'b': s.NilableSpec(s.StringSpec())})
+        spec = s.keys({'a': s.is_string(),
+                       'b': s.nilable(s.is_string())})
         val = data.draw(spec.strategy())
         assert s.is_valid(spec, val)
 
-    # @h.settings(deadline=1000.0)
     @h.given(hst.data())
     def test_coll_of(self, data):
-        spec = s.coll_of(s.NilableSpec(s.StringSpec()))
+        spec = s.coll_of(s.nilable(s.is_string()))
+        val = data.draw(spec.strategy())
+        assert s.is_valid(spec, val)
+
+    @h.given(hst.data())
+    def test_is_int(self, data):
+        spec = s.and_(s.is_int())
         val = data.draw(spec.strategy())
         assert s.is_valid(spec, val)
