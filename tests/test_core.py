@@ -90,3 +90,12 @@ class TestStrategyGeneratesValidValue:
         spec = s.and_(s.is_int())
         val = data.draw(spec.strategy())
         assert s.is_valid(spec, val)
+
+    @h.given(hst.data())
+    def test_is_int(self, data):
+        spec = s.and_(s.is_int({'min_value': 0,
+                                'max_value': 50}),
+                      s.is_int({'min_value': 50,
+                                'max_value': 100}))
+        val = data.draw(spec.strategy())
+        assert s.is_valid(spec, val)

@@ -63,7 +63,11 @@ class AndSpec:
             yield from spec.explain(x, orig_x, trace)
 
     def strategy(self):
-        return hst.one_of(*(s.strategy() for s in self.specs))
+        generative, *discriminative = self.specs
+        result = generative.strategy()
+        for spec in discriminative:
+            result = result.filter(lambda x: is_valid(spec, x))
+        return result
 
 
 class TupleSpec:
