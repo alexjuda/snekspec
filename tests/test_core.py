@@ -1,6 +1,7 @@
 import snekspec.core as s
 
-import hypothesis as hyp
+import hypothesis.strategies as hst
+import hypothesis as h
 
 
 def _spec():
@@ -69,10 +70,12 @@ class TestExamples:
         assert s.is_valid(spec, obj)
 
 
-class TestStrategies:
-    @hyp.given(val=s.keys({'a': s.StringSpec(),
-                           'b': s.NilableSpec(s.StringSpec())}).strategy())
-    def test_keys(self, val):
-        assert s.is_valid(s.keys({'a': s.StringSpec(),
-                                  'b': s.NilableSpec(s.StringSpec())}),
-                          val)
+class TestStrategyGeneratesValidValue:
+    @h.settings(deadline=1000.0)
+    @h.given(hst.data())
+    def test_keys(self, data):
+        spec = s.keys({'a': s.StringSpec(),
+                       'b': s.NilableSpec(s.StringSpec())})
+        val = data.draw(spec.strategy())
+        assert s.is_valid(spec, val)
+
